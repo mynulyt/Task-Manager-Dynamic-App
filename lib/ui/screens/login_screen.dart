@@ -2,6 +2,7 @@ import 'package:doto_manager/ui/screens/forgot_password_verify_email_screen.dart
 import 'package:doto_manager/ui/screens/main_nav_bar_holder_screen.dart';
 import 'package:doto_manager/ui/screens/sign_up_screen.dart';
 import 'package:doto_manager/ui/widgets/screen_background.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -43,6 +44,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextFormField(
                     controller: _emailTEController,
                     decoration: InputDecoration(hintText: 'Email'),
+                    validator: (String? value) {
+                      String InputText = value ?? '';
+                      if (EmailValidator.validate(InputText) == false) {
+                        return 'Enter a valid Email';
+                      }
+                    },
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
