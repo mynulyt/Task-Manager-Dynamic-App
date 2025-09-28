@@ -105,7 +105,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     visible: _signUpProgress == false,
                     replacement: CenteredProgressIndecator(),
                     child: FilledButton(
-                      onPressed: () {},
+                      onPressed: _onTapSubmitButton,
                       child: Icon(Icons.arrow_circle_right_outlined),
                     ),
                   ),
