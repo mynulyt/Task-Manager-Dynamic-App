@@ -5,6 +5,7 @@ import 'package:doto_manager/ui/screens/main_nav_bar_holder_screen.dart';
 import 'package:doto_manager/ui/screens/sign_up_screen.dart';
 import 'package:doto_manager/ui/widgets/centered_progress_indecator.dart';
 import 'package:doto_manager/ui/widgets/screen_background.dart';
+import 'package:doto_manager/ui/widgets/snak_bar_message.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -152,6 +153,22 @@ class _LoginScreenState extends State<LoginScreen> {
       url: Urls.loginUrl,
       body: requestBody,
     );
+    if (response.isSuccess && response.responseData['status'] == 'success') {
+      UserModel model = UserModel.fromJson(response.responseData['data']);
+      String token = response.responseData['token'];
+
+      await AuthController.saveUserData(model, token);
+
+      await Navigator.pushNamedAndRemoveUntil(
+        context,
+        MainNavBarHolderScreen.name,
+        (predicate) => false,
+      );
+    } else {
+      _loginProgress = false;
+      setState(() {});
+      showSnackBarMessage(context, response.errorMessage!);
+    }
   }
 
   @override
