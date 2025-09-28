@@ -49,6 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (EmailValidator.validate(InputText) == false) {
                         return 'Enter a valid Email';
                       }
+                      return null;
                     },
                   ),
                   const SizedBox(height: 8),
