@@ -1,6 +1,7 @@
 import 'package:doto_manager/ui/screens/forgot_password_verify_email_screen.dart';
 import 'package:doto_manager/ui/screens/main_nav_bar_holder_screen.dart';
 import 'package:doto_manager/ui/screens/sign_up_screen.dart';
+import 'package:doto_manager/ui/widgets/centered_progress_indecator.dart';
 import 'package:doto_manager/ui/widgets/screen_background.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
@@ -20,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  bool loginProgress = false;
+  bool _loginProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +66,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: _onTapLoginButton,
-                    child: Icon(Icons.arrow_circle_right_outlined),
+                  Visibility(
+                    visible: _loginProgress == false,
+                    replacement: CenteredProgressIndecator(),
+                    child: FilledButton(
+                      onPressed: _onTapLoginButton,
+                      child: Icon(Icons.arrow_circle_right_outlined),
+                    ),
                   ),
                   const SizedBox(height: 36),
                   Center(
