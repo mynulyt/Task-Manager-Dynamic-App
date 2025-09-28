@@ -1,5 +1,7 @@
+import 'package:doto_manager/Data/model/user_model.dart';
 import 'package:doto_manager/Data/services/api_caller.dart';
 import 'package:doto_manager/Data/utils/urls.dart';
+import 'package:doto_manager/ui/controller/auth_controller.dart';
 import 'package:doto_manager/ui/screens/forgot_password_verify_email_screen.dart';
 import 'package:doto_manager/ui/screens/main_nav_bar_holder_screen.dart';
 import 'package:doto_manager/ui/screens/sign_up_screen.dart';
