@@ -11,7 +11,6 @@ import 'package:doto_manager/ui/widgets/snak_bar_message.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -27,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  bool _loginProgress = false;
+  bool _loginInProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +36,8 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Form(
-              autovalidateMode: AutovalidateMode.onUserInteraction,
               key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -52,9 +51,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _emailTEController,
                     decoration: InputDecoration(hintText: 'Email'),
                     validator: (String? value) {
-                      String InputText = value ?? '';
-                      if (EmailValidator.validate(InputText) == false) {
-                        return 'Enter a valid Email';
+                      String inputText = value ?? '';
+                      if (EmailValidator.validate(inputText) == false) {
+                        return 'Enter a valid email';
                       }
                       return null;
                     },
@@ -66,14 +65,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     decoration: InputDecoration(hintText: 'Password'),
                     validator: (String? value) {
                       if ((value?.length ?? 0) <= 6) {
-                        return 'Password shuld more than 6 letter';
+                        return 'Password should more than 6 letters';
                       }
                       return null;
                     },
                   ),
                   const SizedBox(height: 16),
                   Visibility(
-                    visible: _loginProgress == false,
+                    visible: _loginInProgress == false,
                     replacement: CenteredProgressIndecator(),
                     child: FilledButton(
                       onPressed: _onTapLoginButton,
@@ -137,19 +136,17 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onTapLoginButton() {
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      MainNavBarHolderScreen.name,
-      (predicate) => false,
-    );
+    if (_formKey.currentState!.validate()) {
+      _login();
+    }
   }
 
   Future<void> _login() async {
-    _loginProgress = true;
+    _loginInProgress = true;
     setState(() {});
     Map<String, dynamic> requestBody = {
-      'email': _emailTEController.text.trim(),
-      'password': _passwordTEController.text,
+      "email": _emailTEController.text.trim(),
+      "password": _passwordTEController.text,
     };
     final ApiResponse response = await ApiCaller.postRequest(
       url: Urls.loginUrl,
@@ -167,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
         (predicate) => false,
       );
     } else {
-      _loginProgress = false;
+      _loginInProgress = false;
       setState(() {});
       showSnackBarMessage(context, response.errorMessage!);
     }
