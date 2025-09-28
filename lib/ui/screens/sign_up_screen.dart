@@ -1,5 +1,8 @@
+import 'package:doto_manager/Data/services/api_caller.dart';
+import 'package:doto_manager/Data/utils/urls.dart';
 import 'package:doto_manager/ui/widgets/centered_progress_indecator.dart';
 import 'package:doto_manager/ui/widgets/screen_background.dart';
+import 'package:doto_manager/ui/widgets/snak_bar_message.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -134,6 +137,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
+
+  void _onTapSubmitButton() {
+    if (_formKey.currentState!.validate()) {
+      _signUp();
+    }
+  }
+
+  Future<void> _signUp() async {
+    _signUpProgress = true;
+    setState(() {});
+    Map<String, dynamic> requestBody = {
+      'email': _emailTEController.text.trim(),
+      'firstNmae': _firstNameTEController.text.trim(),
+      'lastName': _lastNameTEController.text.trim(),
+      'mobile': _mobileTEController.text.trim(),
+      'password': _passwordTEController.text,
+    };
+    final ApiResponse response = await ApiCaller.postRequest(
+      url: Urls.registrationUrl,
+      body: requestBody,
+    );
+    _signUpProgress = false;
+    setState(() {});
+    if (response.isSuccess) {
+      _clearTextField();
+      showSnackBarMessage(context, 'Registration Success! Please login');
+    } else
+      showSnackBarMessage(context, response.errorMessage!);
+  }
+
+  void _clearTextField() {}
 
   void _onTapLoginButton() {
     Navigator.pop(context);
