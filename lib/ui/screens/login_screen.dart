@@ -57,6 +57,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _passwordTEController,
                     obscureText: true,
                     decoration: InputDecoration(hintText: 'Password'),
+                    validator: (String? value) {
+                      if ((value?.length ?? 0) <= 6) {
+                        return 'Password shuld more than 6 letter';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
                   FilledButton(
