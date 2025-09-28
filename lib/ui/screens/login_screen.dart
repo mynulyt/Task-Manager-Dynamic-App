@@ -1,3 +1,5 @@
+import 'package:doto_manager/Data/services/api_caller.dart';
+import 'package:doto_manager/Data/utils/urls.dart';
 import 'package:doto_manager/ui/screens/forgot_password_verify_email_screen.dart';
 import 'package:doto_manager/ui/screens/main_nav_bar_holder_screen.dart';
 import 'package:doto_manager/ui/screens/sign_up_screen.dart';
@@ -6,6 +8,7 @@ import 'package:doto_manager/ui/widgets/screen_background.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -135,6 +138,19 @@ class _LoginScreenState extends State<LoginScreen> {
       context,
       MainNavBarHolderScreen.name,
       (predicate) => false,
+    );
+  }
+
+  Future<void> _login() async {
+    _loginProgress = true;
+    setState(() {});
+    Map<String, dynamic> requestBody = {
+      'email': _emailTEController.text.trim(),
+      'password': _passwordTEController.text,
+    };
+    final ApiResponse response = await ApiCaller.postRequest(
+      url: Urls.loginUrl,
+      body: requestBody,
     );
   }
 
