@@ -1,4 +1,6 @@
+import 'package:doto_manager/ui/widgets/centered_progress_indecator.dart';
 import 'package:doto_manager/ui/widgets/screen_background.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +20,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _mobileTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  bool _signUpProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -40,32 +44,67 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   TextFormField(
                     controller: _emailTEController,
                     decoration: InputDecoration(hintText: 'Email'),
+                    validator: (String? value) {
+                      String InputText = value ?? '';
+                      if (EmailValidator.validate(InputText) == false) {
+                        return 'Enter a valid Email';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _firstNameTEController,
                     decoration: InputDecoration(hintText: 'First name'),
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return 'Enter a first name';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _lastNameTEController,
                     decoration: InputDecoration(hintText: 'Last name'),
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return 'Enter a last name';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _mobileTEController,
                     decoration: InputDecoration(hintText: 'Mobile'),
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return 'Enter a phone number';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _passwordTEController,
                     obscureText: true,
                     decoration: InputDecoration(hintText: 'Password'),
+                    validator: (String? value) {
+                      if ((value?.length ?? 0) <= 6) {
+                        return 'Password shuld more than 6 letter';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: () {},
-                    child: Icon(Icons.arrow_circle_right_outlined),
+                  Visibility(
+                    visible: _signUpProgress == false,
+                    replacement: CenteredProgressIndecator(),
+                    child: FilledButton(
+                      onPressed: () {},
+                      child: Icon(Icons.arrow_circle_right_outlined),
+                    ),
                   ),
                   const SizedBox(height: 36),
                   Center(
