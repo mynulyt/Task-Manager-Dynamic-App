@@ -163,8 +163,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (response.isSuccess) {
       _clearTextField();
       showSnackBarMessage(context, 'Registration Success! Please login');
-    } else
+    } else {
       showSnackBarMessage(context, response.errorMessage!);
+    }
   }
 
   void _clearTextField() {}
