@@ -19,7 +19,7 @@ class TaskCard extends StatefulWidget {
 }
 
 class _TaskCardState extends State<TaskCard> {
-  bool _changeStatusInProgress = false;
+  bool _operationInProgress = false; // status change or delete
 
   @override
   Widget build(BuildContext context) {
@@ -29,13 +29,15 @@ class _TaskCardState extends State<TaskCard> {
       title: Text(widget.taskModel.title),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 8,
         children: [
+          SizedBox(height: 4),
           Text(widget.taskModel.description),
+          SizedBox(height: 4),
           Text(
             'Date: ${widget.taskModel.createdDate}',
             style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
           ),
+          SizedBox(height: 8),
           Row(
             children: [
               Chip(
@@ -48,21 +50,24 @@ class _TaskCardState extends State<TaskCard> {
                 ),
               ),
               Spacer(),
-              IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.delete, color: Colors.grey),
-              ),
-              Visibility(
-                visible: _changeStatusInProgress == false,
-                replacement: CircularProgressIndicator(),
-                child: IconButton(
-                  onPressed: () {
-                    _showChangeStatusDialog();
-                  },
-                  icon: Icon(Icons.edit),
-                  color: Colors.grey,
-                ),
-              ),
+              _operationInProgress
+                  ? SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Row(
+                      children: [
+                        IconButton(
+                          onPressed: _showDeleteDialog,
+                          icon: Icon(Icons.delete, color: Colors.grey),
+                        ),
+                        IconButton(
+                          onPressed: _showChangeStatusDialog,
+                          icon: Icon(Icons.edit, color: Colors.grey),
+                        ),
+                      ],
+                    ),
             ],
           ),
         ],
@@ -70,74 +75,85 @@ class _TaskCardState extends State<TaskCard> {
     );
   }
 
+  // ------------------- Status Change -------------------
   void _showChangeStatusDialog() {
     showDialog(
       context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          title: Text('Change Status'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                onTap: () {
-                  _changeStatus('New');
-                },
-                title: Text('New'),
-                trailing: widget.taskModel.status == 'New'
-                    ? Icon(Icons.done)
-                    : null,
-              ),
-              ListTile(
-                onTap: () {
-                  _changeStatus('Progress');
-                },
-                title: Text('Progress'),
-                trailing: widget.taskModel.status == 'Progress'
-                    ? Icon(Icons.done)
-                    : null,
-              ),
-              ListTile(
-                onTap: () {
-                  _changeStatus('Cancelled');
-                },
-                title: Text('Cancelled'),
-                trailing: widget.taskModel.status == 'Cancelled'
-                    ? Icon(Icons.done)
-                    : null,
-              ),
-              ListTile(
-                onTap: () {
-                  _changeStatus('Completed');
-                },
-                title: Text('Completed'),
-                trailing: widget.taskModel.status == 'Completed'
-                    ? Icon(Icons.done)
-                    : null,
-              ),
-            ],
-          ),
-        );
-      },
+      builder: (ctx) => AlertDialog(
+        title: Text('Change Status'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: ['New', 'Progress', 'Cancelled', 'Completed']
+              .map(
+                (status) => ListTile(
+                  onTap: () => _changeStatus(status),
+                  title: Text(status),
+                  trailing: widget.taskModel.status == status
+                      ? Icon(Icons.done)
+                      : null,
+                ),
+              )
+              .toList(),
+        ),
+      ),
     );
   }
 
   Future<void> _changeStatus(String status) async {
-    if (status == widget.taskModel.status) {
-      return;
-    }
+    if (status == widget.taskModel.status) return;
 
     Navigator.pop(context);
+    setState(() => _operationInProgress = true);
 
-    _changeStatusInProgress = true;
-    setState(() {});
     final ApiResponse response = await ApiCaller.getRequest(
       url: Urls.updateTaskStatusUrl(widget.taskModel.id, status),
     );
-    _changeStatusInProgress = false;
-    setState(() {});
+
+    setState(() => _operationInProgress = false);
+
     if (response.isSuccess) {
       widget.refreshParent();
+    } else {
+      showSnackBarMessage(context, response.errorMessage!);
+    }
+  }
+
+  // ------------------- Delete Task -------------------
+  void _showDeleteDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Delete Task'),
+        content: Text('Are you sure you want to delete this task?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _deleteTask();
+            },
+            child: Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deleteTask() async {
+    setState(() => _operationInProgress = true);
+
+    final ApiResponse response = await ApiCaller.getRequest(
+      url: Urls.deleteTaskUrl(widget.taskModel.id),
+    );
+
+    setState(() => _operationInProgress = false);
+
+    if (response.isSuccess) {
+      widget.refreshParent();
+      showSnackBarMessage(context, 'Task deleted successfully');
     } else {
       showSnackBarMessage(context, response.errorMessage!);
     }
