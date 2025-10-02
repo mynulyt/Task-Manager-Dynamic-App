@@ -1,3 +1,5 @@
+import 'package:doto_manager/ui/screens/cancelled_task_screen.dart';
+import 'package:doto_manager/ui/screens/completed_task_screen.dart';
 import 'package:doto_manager/ui/screens/new_task_screen.dart';
 import 'package:doto_manager/ui/screens/progress_task_screen.dart';
 import 'package:flutter/material.dart';
@@ -19,8 +21,8 @@ class _MainNavBarHolderScreenState extends State<MainNavBarHolderScreen> {
   final List<Widget> _screens = [
     NewTaskScreen(),
     ProgressTaskScreen(),
-    ProgressTaskScreen(),
-    ProgressTaskScreen(),
+    CancelledTaskScreen(),
+    CompletedTaskScreen(),
   ];
 
   @override

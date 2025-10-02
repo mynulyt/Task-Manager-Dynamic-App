@@ -12,6 +12,12 @@ class Urls {
   static const String progressTaskListUrl =
       '$_baseUrl/listTaskByStatus/Progress';
 
+  // Cancelled & Completed Task URLs
+  static const String cancelledTaskListUrl =
+      '$_baseUrl/listTaskByStatus/Cancelled';
+  static const String completedTaskListUrl =
+      '$_baseUrl/listTaskByStatus/Completed';
+
   // Update Task Status
   static String updateTaskStatusUrl(String id, String newStatus) =>
       '$_baseUrl/updateTaskStatus/$id/$newStatus';
