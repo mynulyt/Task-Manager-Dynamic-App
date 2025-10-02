@@ -4,12 +4,13 @@ import 'package:doto_manager/Data/model/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController {
-  static const String _accessTokenKey = 'token-key';
-  static const String _userModelKey = 'model-key';
+  static const String _accessTokenKey = 'token';
+  static const String _userModelKey = 'user-data';
+
   static String? accessToken;
   static UserModel? userModel;
 
-  static Future<void> saveData(UserModel model, String token) async {
+  static Future<void> saveUserData(UserModel model, String token) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.setString(_accessTokenKey, token);
     await sharedPreferences.setString(
@@ -30,7 +31,7 @@ class AuthController {
     }
   }
 
-  static Future<bool> isUserAlreadylogIn() async {
+  static Future<bool> isUserAlreadyLoggedIn() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String? token = sharedPreferences.getString(_accessTokenKey);
     return token != null;

@@ -156,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
       UserModel model = UserModel.fromJson(response.responseData['data']);
       String token = response.responseData['token'];
 
-      await AuthController.saveData(model, token);
+      await AuthController.saveUserData(model, token);
 
       await Navigator.pushNamedAndRemoveUntil(
         context,
