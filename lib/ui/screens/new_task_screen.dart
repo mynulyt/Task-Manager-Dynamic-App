@@ -1,4 +1,10 @@
+import 'package:doto_manager/Data/model/task_model.dart';
+import 'package:doto_manager/Data/model/task_status_count.dart';
+import 'package:doto_manager/Data/services/api_caller.dart';
+import 'package:doto_manager/Data/utils/urls.dart';
 import 'package:doto_manager/ui/screens/add_new_task_screen.dart';
+import 'package:doto_manager/ui/widgets/centered_progress_indecator.dart';
+import 'package:doto_manager/ui/widgets/snak_bar_message.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/task_card.dart';
@@ -12,6 +18,56 @@ class NewTaskScreen extends StatefulWidget {
 }
 
 class _NewTaskScreenState extends State<NewTaskScreen> {
+  bool _getTaskStatusCountInProgress = false;
+  bool _getNewTaskInProgress = false;
+  List<TaskStatusCountModel> _taskStatusCountList = [];
+  List<TaskModel> _newTaskList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getAllTaskStatusCount();
+    _getAllNewTasks();
+  }
+
+  Future<void> _getAllTaskStatusCount() async {
+    _getTaskStatusCountInProgress = true;
+    setState(() {});
+    final ApiResponse response = await ApiCaller.getRequest(
+      url: Urls.taskStatusCountUrl,
+    );
+    if (response.isSuccess) {
+      List<TaskStatusCountModel> list = [];
+      for (Map<String, dynamic> jsonData in response.responseData['data']) {
+        list.add(TaskStatusCountModel.fromJson(jsonData));
+      }
+      _taskStatusCountList = list;
+    } else {
+      showSnackBarMessage(context, response.errorMessage!);
+    }
+    _getTaskStatusCountInProgress = false;
+    setState(() {});
+  }
+
+  Future<void> _getAllNewTasks() async {
+    _getNewTaskInProgress = true;
+    setState(() {});
+    final ApiResponse response = await ApiCaller.getRequest(
+      url: Urls.newTaskListUrl,
+    );
+    if (response.isSuccess) {
+      List<TaskModel> list = [];
+      for (Map<String, dynamic> jsonData in response.responseData['data']) {
+        list.add(TaskModel.fromJson(jsonData));
+      }
+      _newTaskList = list;
+    } else {
+      showSnackBarMessage(context, response.errorMessage!);
+    }
+    _getNewTaskInProgress = false;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,26 +78,42 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
             const SizedBox(height: 16),
             SizedBox(
               height: 90,
-              child: ListView.separated(
-                itemCount: 4,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) {
-                  return TaskCountByStatusCard(title: 'New', count: 2);
-                },
-                separatorBuilder: (context, index) {
-                  return SizedBox(width: 4);
-                },
+              child: Visibility(
+                visible: _getTaskStatusCountInProgress == false,
+                replacement: CenteredProgressIndecator(),
+                child: ListView.separated(
+                  itemCount: _taskStatusCountList.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    return TaskCountByStatusCard(
+                      title: _taskStatusCountList[index].status,
+                      count: _taskStatusCountList[index].count,
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return SizedBox(width: 4);
+                  },
+                ),
               ),
             ),
             Expanded(
-              child: ListView.separated(
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  return TaskCard();
-                },
-                separatorBuilder: (context, index) {
-                  return SizedBox(height: 8);
-                },
+              child: Visibility(
+                visible: _getNewTaskInProgress == false,
+                replacement: CenteredProgressIndecator(),
+                child: ListView.separated(
+                  itemCount: _newTaskList.length,
+                  itemBuilder: (context, index) {
+                    return TaskCard(
+                      taskModel: _newTaskList[index],
+                      refreshParent: () {
+                        _getAllNewTasks();
+                      },
+                    );
+                  },
+                  separatorBuilder: (context, index) {
+                    return SizedBox(height: 8);
+                  },
+                ),
               ),
             ),
           ],

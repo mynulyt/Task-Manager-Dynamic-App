@@ -1,5 +1,9 @@
 import 'dart:convert';
 
+import 'package:doto_manager/app.dart';
+import 'package:doto_manager/ui/controller/auth_controller.dart';
+import 'package:doto_manager/ui/screens/login_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
 import 'package:logger/logger.dart';
 
@@ -11,7 +15,10 @@ class ApiCaller {
       Uri uri = Uri.parse(url);
 
       _logRequest(url);
-      Response response = await get(uri);
+      Response response = await get(
+        uri,
+        headers: {'token': AuthController.accessToken ?? ''},
+      );
       _logResponse(url, response);
 
       final int statusCode = response.statusCode;
@@ -23,6 +30,14 @@ class ApiCaller {
           isSuccess: true,
           responseCode: statusCode,
           responseData: decodedData,
+        );
+      } else if (statusCode == 401) {
+        await _moveToLogin();
+        return ApiResponse(
+          isSuccess: false,
+          responseCode: statusCode,
+          errorMessage: 'Un-authorize',
+          responseData: null,
         );
       } else {
         // FAILED
@@ -54,7 +69,10 @@ class ApiCaller {
       _logRequest(url, body: body);
       Response response = await post(
         uri,
-        headers: {'content-type': 'application/json'},
+        headers: {
+          'content-type': 'application/json',
+          'token': AuthController.accessToken ?? '',
+        },
         body: jsonEncode(body),
       );
       _logResponse(url, response);
@@ -68,6 +86,14 @@ class ApiCaller {
           isSuccess: true,
           responseCode: statusCode,
           responseData: decodedData,
+        );
+      } else if (statusCode == 401) {
+        await _moveToLogin();
+        return ApiResponse(
+          isSuccess: false,
+          responseCode: statusCode,
+          errorMessage: 'Un-authorize',
+          responseData: null,
         );
       } else {
         // FAILED
@@ -101,6 +127,15 @@ class ApiCaller {
       'URL => $url\n'
       'Status Code: ${response.statusCode}\n'
       'Body: ${response.body}',
+    );
+  }
+
+  static Future<void> _moveToLogin() async {
+    await AuthController.clearUserData();
+    Navigator.pushNamedAndRemoveUntil(
+      TaskManagerApp.navigator.currentContext!,
+      LoginScreen.name,
+      (predicate) => false,
     );
   }
 }

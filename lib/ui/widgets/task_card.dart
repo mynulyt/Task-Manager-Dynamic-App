@@ -1,7 +1,12 @@
+import 'package:doto_manager/Data/model/task_model.dart';
 import 'package:flutter/material.dart';
 
 class TaskCard extends StatelessWidget {
-  const TaskCard({super.key});
+  const TaskCard({
+    super.key,
+    required TaskModel taskModel,
+    required Null Function() refreshParent,
+  });
 
   @override
   Widget build(BuildContext context) {
