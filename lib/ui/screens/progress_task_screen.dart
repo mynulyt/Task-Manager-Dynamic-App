@@ -1,10 +1,10 @@
 import 'package:doto_manager/Data/model/task_model.dart';
+import 'package:doto_manager/Data/utils/urls.dart';
 import 'package:doto_manager/ui/widgets/centered_progress_indecator.dart';
 import 'package:doto_manager/ui/widgets/snak_bar_message.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/services/api_caller.dart';
-import '../../data/utils/urls.dart';
 
 import '../widgets/task_card.dart';
 
